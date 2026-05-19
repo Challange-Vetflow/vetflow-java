@@ -65,7 +65,7 @@ public class VaccineController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza dados de uma vacina registrada")
     public ResponseEntity<VaccineResponse> update(@PathVariable Long id,
-                                                   @Valid @RequestBody VaccineRequest request) {
+                                                  @Valid @RequestBody VaccineRequest request) {
         return ResponseEntity.ok(VaccineResponse.fromEntity(vaccineService.update(id, request)));
     }
 
