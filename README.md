@@ -68,7 +68,7 @@ spring.h2.console.enabled=false
 | /api/pets | paginado+sort | /{id} | criar | /{id} | /{id} |
 | /api/clinics | lista | /{id} | criar | /{id} | /{id} |
 | /api/appointments | lista | /{id} | criar | /{id} | /{id} |
-| /api/vaccines | paginado | /{id} | criar | - | /{id} |
+| /api/vaccines | paginado | /{id} | criar | /{id} | /{id} |
 | /api/medications | lista | /{id} | criar | /{id} | /{id} |
 
 Rotas extras: `/api/pets/by-tutor/{id}`, `/api/vaccines/expired`, `/api/vaccines/due-soon`, `/api/appointments/pending`, `/api/medications/active`, `/api/tutors/search`
