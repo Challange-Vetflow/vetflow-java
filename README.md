@@ -20,7 +20,22 @@ Tutores de pets só acionam clínicas em urgências ou vacinas óbvias. Isso ger
 
 API REST que centraliza o histórico clínico do pet, organiza agendamentos, registra vacinas e medicamentos, servindo como backend para app mobile, dashboard clínico e integrações via WhatsApp.
 
+## Diagramas
+
+### Diagrama de Classes
+
+![Diagrama de Classes](docs/diagrama_classes.png)
+
+### DER — Diagrama Entidade-Relacionamento
+
+![DER](docs/der.png)
+
+## Cronograma de Desenvolvimento
+
+Disponível em [docs/cronograma.md](docs/cronograma.md)
+
 ## Arquitetura Java
+
 ```
 src/main/java/fiap/com/br/vetflow/
 ├── config/       SwaggerConfig
@@ -34,6 +49,7 @@ src/main/java/fiap/com/br/vetflow/
 ```
 
 ## Tecnologias
+
 - Spring Boot 3.4, Spring Data JPA, Spring Cache, Lombok
 - H2 in-memory (desenvolvimento), Oracle XE (produção)
 - Swagger/OpenAPI via springdoc
@@ -44,12 +60,13 @@ src/main/java/fiap/com/br/vetflow/
 ./mvnw spring-boot:run
 ```
 
-- Swagger: http://localhost:8080/swagger-ui.html
-- H2 Console: http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:mem:vetflowdb`)
+- Swagger: `http://localhost:8080/swagger-ui.html`
+- H2 Console: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:vetflowdb`)
 
 ## Produção com Oracle FIAP
 
 Edite `src/main/resources/application.properties`:
+
 ```properties
 spring.datasource.url=jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl
 spring.datasource.username=<SEU_RM>
@@ -73,7 +90,14 @@ spring.h2.console.enabled=false
 
 Rotas extras: `/api/pets/by-tutor/{id}`, `/api/vaccines/expired`, `/api/vaccines/due-soon`, `/api/appointments/pending`, `/api/medications/active`, `/api/tutors/search`
 
+## Testes — Collection Postman
+
+A collection com todos os endpoints testados está disponível em [`docs/VetFlow API.postman_collection.json`](docs/VetFlow%20API.postman_collection.json).
+
+Importe no Postman via **Import > Upload Files** e use a variável `baseUrl = http://localhost:8080`.
+
 ## Benefícios para o Negócio
+
 - Aumento da recorrência de consultas preventivas
 - Redução de vacinas vencidas e abandono de tratamentos
 - Histórico longitudinal estruturado por pet
