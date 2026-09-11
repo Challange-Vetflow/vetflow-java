@@ -1,4 +1,4 @@
-# VetFlow API — Challenge FIAP 2026
+# VetFlow API + Web — Challenge FIAP 2026
 
 Solução desenvolvida para o **Challenge FIAP 2026** em parceria com a **CLYVO VET**.
 
@@ -7,10 +7,10 @@ Solução desenvolvida para o **Challenge FIAP 2026** em parceria com a **CLYVO 
 | Nome | RM | Turma |
 |------|----|-------|
 | Andrei de Paiva Gibbini | 563061 | 2TDSPF |
-| Pedro Sakai Silva Zambaca | 565956 | 2TDSPF |
-| Pedro Santos Pequini | 561842 | 2TDSPF |
 | Arthur Câmara | 562310 | 2TDSPG |
 | Diogo Cunha | 563654 | 2TDSPF |
+| Pedro Sakai Silva Zambaca | 565956 | 2TDSPF |
+| Pedro Santos Pequini | 561842 | 2TDSPF |
 
 ## Problema de Negócio
 
@@ -18,87 +18,107 @@ Tutores de pets só acionam clínicas em urgências ou vacinas óbvias. Isso ger
 
 ## Solução
 
-API REST que centraliza o histórico clínico do pet, organiza agendamentos, registra vacinas e medicamentos, servindo como backend para app mobile, dashboard clínico e integrações via WhatsApp.
+Nesta sprint o VetFlow evolui de uma API REST pura para uma **aplicação web completa**: além dos endpoints REST, agora existe uma camada de visualização (Thymeleaf), controle de versões de banco (Flyway) e autenticação/autorização com dois perfis de usuário (Spring Security).
 
-## Diagramas
-
-### Diagrama de Classes
-
-![Diagrama de Classes](docs/diagrama_classes.png)
-
-### DER — Diagrama Entidade-Relacionamento
-
-![DER](docs/der.png)
-
-## Cronograma de Desenvolvimento
-
-Disponível em [docs/cronograma.md](docs/cronograma.md)
-
-## Arquitetura Java
+## Arquitetura
 
 ```
 src/main/java/fiap/com/br/vetflow/
-├── config/       SwaggerConfig
-├── controller/   TutorController, PetController, ClinicController,
-│                 AppointmentController, VaccineController, MedicationController
-├── dto/          TutorDtos, PetDtos, ClinicDtos, AppointmentDtos, VaccineDtos, MedicationDtos
-├── entity/       Tutor, Pet, Clinic, Appointment, Vaccine, Medication + Enums
-├── repository/   Spring Data JPA com JPQL customizada
-└── service/      TutorService, PetService, ClinicService,
-                  AppointmentService, VaccineService, MedicationService
+├── config/            SwaggerConfig
+├── controller/        API REST — TutorController, PetController, ClinicController,
+│                       AppointmentController, VaccineController, MedicationController
+├── controller/api/     AuthApiController — login/registro/sessão em JSON, para clientes mobile
+├── controller/web/     Frontend — AuthController (login/registro), WebController (dashboard, fluxos)
+├── dto/                TutorDtos, PetDtos, ClinicDtos, AppointmentDtos, VaccineDtos, MedicationDtos, RegisterDtos
+├── entity/             Tutor, Pet, Clinic, Appointment, Vaccine, Medication, User, UserRole
+├── repository/         Interfaces JpaRepository de cada entidade
+├── security/           SecurityConfig, VetFlowUserDetailsService
+└── service/            Regras de negócio por entidade
+
+src/main/resources/
+├── db/migration/       Scripts Flyway (V1, V2, V3)
+└── templates/          Views Thymeleaf (auth, dashboard, pets, appointments, vaccines)
 ```
 
 ## Tecnologias
 
-- Spring Boot 3.4, Spring Data JPA, Spring Cache, Lombok
-- H2 in-memory (desenvolvimento), Oracle XE (produção)
-- Swagger/OpenAPI via springdoc
+| Camada | Tecnologia |
+|---|---|
+| Framework | Spring Boot 3.4 |
+| Frontend | Thymeleaf + Bootstrap 5 |
+| Persistência | Spring Data JPA |
+| Migrations | Flyway |
+| Segurança | Spring Security (login form + BCrypt) |
+| Banco de dados | H2 (arquivo persistente, único perfil configurado no projeto) |
+| Documentação | Swagger / OpenAPI |
+
+## Perfis de Usuário
+
+| Perfil | Acesso |
+|---|---|
+| **TUTOR** | Vê e gerencia apenas os próprios pets; pode agendar consultas |
+| **VET** | Vê todos os pets, clínicas e agendamentos; pode registrar vacinas aplicadas |
 
 ## Como Executar
 
 ```bash
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
-- Swagger: `http://localhost:8080/swagger-ui.html`
-- H2 Console: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:vetflowdb`)
+- **Aplicação web**: http://localhost:8080/login
+- **Swagger (API REST)**: http://localhost:8080/swagger-ui.html
+- **Console H2**: http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:file:./data/vetflowdb`)
 
-## Produção com Oracle FIAP
+### Usuários de teste (senha: `senha123` para todos)
 
-Edite `src/main/resources/application.properties`:
+| Perfil | E-mail |
+|---|---|
+| Veterinário | vet@vetflow.com |
+| Tutor | carlos.mendes@email.com |
 
-```properties
-spring.datasource.url=jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl
-spring.datasource.username=<SEU_RM>
-spring.datasource.password=<SUA_SENHA>
-spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-spring.jpa.database-platform=org.hibernate.dialect.OracleDialect
-spring.jpa.hibernate.ddl-auto=none
-spring.h2.console.enabled=false
-```
+Também é possível criar uma nova conta de tutor pela tela **Cadastre-se** no login.
 
-## Rotas Principais
+## Controle de Versão do Banco (Flyway)
 
-| Recurso | GET lista | GET id | POST | PUT | DELETE |
-|---------|-----------|--------|------|-----|--------|
-| /api/tutors | paginado+sort | /{id} | criar | /{id} | /{id} |
-| /api/pets | paginado+sort | /{id} | criar | /{id} | /{id} |
-| /api/clinics | lista | /{id} | criar | /{id} | /{id} |
-| /api/appointments | lista | /{id} | criar | /{id} | /{id} |
-| /api/vaccines | paginado | /{id} | criar | /{id} | /{id} |
-| /api/medications | lista | /{id} | criar | /{id} | /{id} |
+O schema não é mais gerado automaticamente pelo Hibernate (`ddl-auto=create-drop`). Agora o Flyway é a única fonte de verdade:
 
-Rotas extras: `/api/pets/by-tutor/{id}`, `/api/vaccines/expired`, `/api/vaccines/due-soon`, `/api/appointments/pending`, `/api/medications/active`, `/api/tutors/search`
+| Migration | Conteúdo |
+|---|---|
+| `V1__base_schema.sql` | Tabelas de domínio (tutores, pets, clínicas, agendamentos, vacinas, medicamentos) |
+| `V2__create_users_table.sql` | Tabela de usuários (`vf_users`) para autenticação |
+| `V3__seed_data.sql` | Carga inicial de dados de demonstração |
 
-## Testes — Collection Postman
+Toda alteração futura de schema deve entrar como uma nova migration versionada (`V4__...`, `V5__...`), nunca alterando as anteriores.
 
-A collection com todos os endpoints testados está disponível em [`docs/VetFlow API.postman_collection.json`](docs/VetFlow%20API.postman_collection.json).
+## Fluxos Completos (além do CRUD)
 
-Importe no Postman via **Import > Upload Files** e use a variável `baseUrl = http://localhost:8080`.
+### 1. Agendamento de consulta (Tutor)
+O tutor acessa o pet, clica em **Agendar consulta**, escolhe clínica, tipo e data/hora, confirma — o sistema cria o agendamento e retorna ao histórico do pet.
+
+`GET/POST /web/appointments/schedule/{petId}`
+
+### 2. Registro de vacina aplicada (Veterinário)
+O veterinário acessa o pet, clica em **Registrar vacina**, preenche nome, data de aplicação e próxima dose, confirma — o sistema salva a vacina no histórico do pet. Rota restrita ao perfil `VET`.
+
+`GET/POST /web/vaccines/apply/{petId}`
+
+## Endpoints REST (API)
+
+*(inalterados desde a sprint anterior — protegidos por autenticação)*
+
+### Tutors `/api/tutors`, Pets `/api/pets`, Clinics `/api/clinics`, Appointments `/api/appointments`, Vaccines `/api/vaccines`, Medications `/api/medications`
+
+Ver documentação completa e testável no Swagger: `/swagger-ui.html`
+
+## Validações
+
+- Formulário de cadastro de tutor: nome, e-mail (formato válido), telefone e senha (mínimo 6 caracteres) obrigatórios.
+- Formulário de agendamento: clínica, tipo e data/hora obrigatórios; tutor só agenda para os próprios pets.
+- Formulário de vacina: nome, data de aplicação e próxima dose obrigatórios; próxima dose deve ser posterior à aplicação.
 
 ## Benefícios para o Negócio
 
-- Aumento da recorrência de consultas preventivas
+- Aumento da recorrência de consultas preventivas nas clínicas parceiras
 - Redução de vacinas vencidas e abandono de tratamentos
 - Histórico longitudinal estruturado por pet
-- Base escalável para integração com app mobile e WhatsApp
+- Acesso segmentado por perfil, reduzindo risco de acesso indevido a dados de outros tutores
