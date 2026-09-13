@@ -69,6 +69,10 @@ mvn spring-boot:run
 - **Swagger (API REST)**: http://localhost:8080/swagger-ui.html
 - **Console H2**: http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:file:./data/vetflowdb`)
 
+## Vídeo de Demonstração
+
+[Assista aqui](https://youtu.be/JnOn-I_C7ZI)
+
 ### Usuários de teste (senha: `senha123` para todos)
 
 | Perfil | E-mail |
