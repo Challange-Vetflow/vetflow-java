@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Recursos públicos
                         .requestMatchers("/login", "/css/**", "/js/**", "/webjars/**", "/error").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/api-docs/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/h2-console/**").permitAll()
 
                         // NOVO — libera login/registro via JSON para o app mobile.
                         // Só os 4 endpoints abaixo ficam públicos; todo o resto de /api/** continua exigindo login.
